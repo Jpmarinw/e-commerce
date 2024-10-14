@@ -1,3 +1,5 @@
+// Sistema de e-commerce da equipe JAJIG
+
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
