@@ -2,6 +2,7 @@ const {Category} = require('../models/category')
 const express = require('express');
 const router = express.Router();
 
+// TRAZER A LISTA DE CATEGORIAS
 router.get(`/`, async (req, res) => {
     const categoryList = await Category.find();
 
@@ -11,6 +12,7 @@ router.get(`/`, async (req, res) => {
     res.status(200).send(categoryList);
 })
 
+// TRAZER UMA CATEGORIA PELO ID
 router.get('/:id', async(req, res) => {
     const category = await Category.findById(req.params.id);
 
@@ -22,6 +24,7 @@ router.get('/:id', async(req, res) => {
     res.status(200).send(category);
 })
 
+// ADICIONAR UMA CATEGORIA
 router.post('/', async (req, res) => {
     let category = new Category({
         name: req.body.name,
@@ -35,6 +38,7 @@ router.post('/', async (req, res) => {
     res.send(category);
 })
 
+// ALTERAR UMA CATEGORIA
 router.put('/:id', async(req, res) => {
     const category = await Category.findByIdAndUpdate(
         req.params.id,
@@ -51,6 +55,7 @@ router.put('/:id', async(req, res) => {
     res.send(category)
 })
 
+//DELETAR UMA CATEGORIA
 router.delete('/:id', (req, res)=>{
     Category.findByIdAndDelete(req.params.id).then(category => {
         if (category) {
