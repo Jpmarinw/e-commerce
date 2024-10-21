@@ -44,4 +44,17 @@ router.post(`/`, async (req, res) => {
     
 })
 
+// DELETAR UM PRODUTO
+router.delete('/:id', (req, res)=>{
+    Product.findByIdAndDelete(req.params.id).then(product => {
+        if (product) {
+            return res.status(200).json({sucess: true, message: 'O produto foi deletado com sucesso!'})
+        } else {
+            return res.status(404).json({sucess: false, message: 'O produto não foi encontrado!'})
+        }
+    }).catch(err=>{
+        return res.status(400).json({sucess: false, error: err})
+    })
+})
+
 module.exports = router;
