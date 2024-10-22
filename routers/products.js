@@ -2,10 +2,11 @@ const {Product} = require('../models/product');
 const {Category} = require('../models/category');
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 
 // TRAZER A LISTA DE PRODUTOS
 router.get(`/`, async (req, res) => {
-    const productList = await Product.find();
+    const productList = await Product.find().select('nome imagem category -_id').populate('category');
 
     if(!productList) {
         res.status(500).json({sucess: false})
@@ -13,13 +14,22 @@ router.get(`/`, async (req, res) => {
     res.send(productList);
 })
 
+// TRAZER UM PRODUTO APENAS
+router.get(`/:id`, async (req, res) => {
+    const product = await Product.findById(req.params.id).populate('category');
+
+    if(!product) {
+        res.status(500).json({sucess: false})
+    }
+    res.send(product);
+})
+
 // ADICIONAR UM PRODUTO
 router.post(`/`, async (req, res) => {
-    try {
-        const category = await Category.findById(req.body.category);
+    const category = await Category.findById(req.body.category);
     if (!category) return res.status(400).send('Categoria inválida!');
 
-    const product = new Product({
+    let product = new Product({
         nome: req.body.nome,
         description: req.body.description,
         richDescription: req.body.richDescription,
@@ -30,7 +40,7 @@ router.post(`/`, async (req, res) => {
         qtdeEstoque: req.body.qtdeEstoque,
         rating: req.body.rating,
         numReviews: req.body.numReviews,
-        isFeature: req.body.isFeature
+        isFeatured: req.body.isFeatured
     })
 
     const savedProduct = await product.save();
@@ -38,10 +48,37 @@ router.post(`/`, async (req, res) => {
     if (!savedProduct)
         return res.status(400).send('O produto não foi criado')
     res.send(product)
-    }catch (error) {
-        res.status(500).send('Erro no servidor: ${error.message}');
+})
+
+// ALTERAR UM PRODUTO
+router.put('/:id', async(req, res) => {
+    if(!mongoose.isValidObjectId(req.params.id)) {
+        res.status(400).send('ID do produto é inválido')
     }
-    
+    const category = await Category.findById(req.body.category);
+    if (!category) return res.status(400).send('Categoria inválida!');
+
+    const product = await Product.findByIdAndUpdate(
+        req.params.id,
+        {
+            nome: req.body.nome,
+            description: req.body.description,
+            richDescription: req.body.richDescription,
+            imagem: req.body.imagem,
+            brand: req.body.brand,
+            price: req.body.price,
+            category: req.body.category,
+            qtdeEstoque: req.body.qtdeEstoque,
+            rating: req.body.rating,
+            numReviews: req.body.numReviews,
+            isFeatured: req.body.isFeatured
+        },
+        { new: true}
+    )
+
+    if (!product)
+        return res.status(400).send('O produto não foi criado!')
+    res.send(product)
 })
 
 // DELETAR UM PRODUTO
