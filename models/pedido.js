@@ -1,7 +1,5 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const pedidoSchema = mongoose.Schema({
-   
-})
+const pedidoSchema = mongoose.Schema({});
 
-exports.Pedido = mongoose.model('Pedido', pedidoSchema);
+exports.Pedido = mongoose.model("Pedido", pedidoSchema);
