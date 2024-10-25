@@ -1,34 +1,34 @@
 const mongoose = require("mongoose");
 
-const productSchema = mongoose.Schema({
+const produtoSchema = mongoose.Schema({
   nome: {
     type: String,
     require: true,
   },
-  description: {
+  descricao: {
     type: String,
     require: true,
   },
-  richDescription: {
+  descDetalhada: {
     type: String,
     default: "",
   },
-  images: [
+  imagens: [
     {
       type: String,
     },
   ],
-  brand: {
+  marca: {
     type: String,
     default: "",
   },
-  price: {
+  preco: {
     type: Number,
     default: 0,
   },
-  category: {
+  categoria: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Category",
+    ref: "Categoria",
     required: true,
   },
   imagem: {
@@ -41,7 +41,7 @@ const productSchema = mongoose.Schema({
     min: 0,
     max: 255,
   },
-  rating: {
+  avaliacao: {
     type: Number,
     default: 0,
   },
@@ -49,22 +49,22 @@ const productSchema = mongoose.Schema({
     type: Number,
     default: 0,
   },
-  isFeatured: {
+  isDestaque: {
     type: Boolean,
     default: false,
   },
-  dateCreated: {
+  dataCriacao: {
     type: Date,
     default: Date.now,
   },
 });
 
 // SE EU QUISER EXCLUR O _ID DA VISUALIZAÇÃO DO JSON
-/*productSchema.virtual("id").get(function () {
+/*produtoSchema.virtual("id").get(function () {
   return this._id ? this._id.toHexString() : null;
 });
 
-productSchema.set("toJSON", {
+produtoSchema.set("toJSON", {
   virtuals: true, // Inclui campos virtuais na conversão para JSON
   versionKey: false, // Remove o campo __v
   transform: function (doc, ret) {
@@ -73,12 +73,12 @@ productSchema.set("toJSON", {
 });*/
 
 // ADICIONA UM VIRTUAL ID
-productSchema.virtual('id').get(function() {
+produtoSchema.virtual("id").get(function () {
   return this._id.toHexString();
 });
 
-productSchema.set('toJSON', {
+produtoSchema.set("toJSON", {
   virtuals: true,
-})
+});
 
-exports.Product = mongoose.model("Product", productSchema);
+exports.Produto = mongoose.model("Produto", produtoSchema);

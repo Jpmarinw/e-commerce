@@ -1,54 +1,54 @@
-const { Product } = require("../models/product");
-const { Category } = require("../models/category");
+const { Produto } = require("../models/produto");
+const { Categoria } = require("../models/categoria");
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 
 // TRAZER A LISTA DE PRODUTOS
 router.get(`/`, async (req, res) => {
-  const productList = await Product.find()
-    .select("nome imagem category _id id")
-    .populate("category");
+  const produtoList = await Produto.find()
+    .select("nome imagem categoria _id id")
+    .populate("categoria");
 
-  if (!productList) {
+  if (!produtoList) {
     res.status(500).json({ sucess: false });
   }
-  res.send(productList);
+  res.send(produtoList);
 });
 
 // TRAZER UM PRODUTO APENAS
 router.get(`/:id`, async (req, res) => {
-  const product = await Product.findById(req.params.id).populate("category");
+  const produto = await Produto.findById(req.params.id).populate("categoria");
 
-  if (!product) {
+  if (!produto) {
     res.status(500).json({ sucess: false });
   }
-  res.send(product);
+  res.send(produto);
 });
 
 // ADICIONAR UM PRODUTO
 router.post(`/`, async (req, res) => {
-  const category = await Category.findById(req.body.category);
-  if (!category) return res.status(400).send("Categoria inválida!");
+  const categoria = await Categoria.findById(req.body.categoria);
+  if (!categoria) return res.status(400).send("Categoria inválida!");
 
-  let product = new Product({
+  let produto = new Produto({
     nome: req.body.nome,
-    description: req.body.description,
-    richDescription: req.body.richDescription,
+    descricao: req.body.descricao,
+    descDetalhada: req.body.descDetalhada,
     imagem: req.body.imagem,
-    brand: req.body.brand,
-    price: req.body.price,
-    category: req.body.category,
+    marca: req.body.marca,
+    preco: req.body.preco,
+    categoria: req.body.categoria,
     qtdeEstoque: req.body.qtdeEstoque,
-    rating: req.body.rating,
+    avaliacao: req.body.avaliacao,
     numReviews: req.body.numReviews,
-    isFeatured: req.body.isFeatured,
+    isDestaque: req.body.isDestaque,
   });
 
-  const savedProduct = await product.save();
+  const savedProduto = await produto.save();
 
-  if (!savedProduct) return res.status(400).send("O produto não foi criado");
-  res.send(product);
+  if (!savedProduto) return res.status(400).send("O produto não foi criado");
+  res.send(produto);
 });
 
 // ALTERAR UM PRODUTO
@@ -56,36 +56,36 @@ router.put("/:id", async (req, res) => {
   if (!mongoose.isValidObjectId(req.params.id)) {
     res.status(400).send("ID do produto é inválido");
   }
-  const category = await Category.findById(req.body.category);
-  if (!category) return res.status(400).send("Categoria inválida!");
+  const categoria = await Categoria.findById(req.body.categoria);
+  if (!categoria) return res.status(400).send("Categoria inválida!");
 
-  const product = await Product.findByIdAndUpdate(
+  const produto = await Produto.findByIdAndUpdate(
     req.params.id,
     {
       nome: req.body.nome,
-      description: req.body.description,
-      richDescription: req.body.richDescription,
+      descricao: req.body.descricao,
+      descDetalhada: req.body.descDetalhada,
       imagem: req.body.imagem,
-      brand: req.body.brand,
-      price: req.body.price,
-      category: req.body.category,
+      marca: req.body.marca,
+      preco: req.body.preco,
+      categoria: req.body.categoria,
       qtdeEstoque: req.body.qtdeEstoque,
-      rating: req.body.rating,
+      avaliacao: req.body.avaliacao,
       numReviews: req.body.numReviews,
-      isFeatured: req.body.isFeatured,
+      isDestaque: req.body.isDestaque,
     },
     { new: true }
   );
 
-  if (!product) return res.status(400).send("O produto não foi criado!");
-  res.send(product);
+  if (!produto) return res.status(400).send("O produto não foi criado!");
+  res.send(produto);
 });
 
 // DELETAR UM PRODUTO
 router.delete("/:id", (req, res) => {
-  Product.findByIdAndDelete(req.params.id)
-    .then((product) => {
-      if (product) {
+  Produto.findByIdAndDelete(req.params.id)
+    .then((produto) => {
+      if (produto) {
         return res.status(200).json({
           sucess: true,
           message: "O produto foi deletado com sucesso!",
@@ -104,15 +104,15 @@ router.delete("/:id", (req, res) => {
 // TRAZER A QUANTIDADE DE PRODUTOS
 router.get("/get/count", async (req, res) => {
   try {
-    const productCount = await Product.countDocuments();
+    const produtoCount = await Produto.countDocuments();
 
-    if (productCount === 0) {
+    if (produtoCount === 0) {
       return res
         .status(404)
         .json({ success: false, message: "Nenhum produto encontrado" });
     }
 
-    res.status(200).json({ quantidade: productCount });
+    res.status(200).json({ quantidade: produtoCount });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -121,30 +121,28 @@ router.get("/get/count", async (req, res) => {
 // TRAZER A QUANTIDADE DE PRODUTOS EM DESTAQUE
 router.get("/get/destaque/:count", async (req, res) => {
   const count = req.params.count ? req.params.count : 0;
-  const products = await Product.find({ isFeatured: true }).limit(+count);
+  const produtos = await Produto.find({ isDestaque: true }).limit(+count);
 
-  if (!products) {
+  if (!produtos) {
     res.status(500).json({ sucess: false });
   }
-  res.send(products);
+  res.send(produtos);
 });
 
 // TRAZER PRODUTOS POR CATEGORIA
 router.get(`/`, async (req, res) => {
   let filter = {};
 
-  if (req.query.categories) {
-    filter = req.query.categories.split(",");
+  if (req.query.categorias) {
+    filter = req.query.categorias.split(",");
   }
 
-  const productList = await Product.find(filter).populate(
-    "category"
-  );
+  const produtoList = await Produto.find(filter).populate("categoria");
 
-  if (!productList) {
+  if (!produtoList) {
     res.status(500).json({ sucess: false });
   }
-  res.send(productList);
+  res.send(produtoList);
 });
 
 module.exports = router;

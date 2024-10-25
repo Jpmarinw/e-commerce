@@ -9,8 +9,8 @@ const mongoose = require("mongoose");
 require("dotenv/config");
 const api = process.env.API_URL;
 
-const productsRoutes = require("../routers/products");
-const categoriesRoutes = require("../routers/categories");
+const produtosRoutes = require("../routers/produtos");
+const categoriasRoutes = require("../routers/categorias");
 const usuariosRoutes = require("../routers/usuarios");
 const pedidosRoutes = require("../routers/pedidos");
 
@@ -19,8 +19,8 @@ app.use(bodyParser.json());
 app.use(morgan("tiny"));
 
 //Routers
-app.use(`${api}/products`, productsRoutes);
-app.use(`${api}/categories`, categoriesRoutes);
+app.use(`${api}/produtos`, produtosRoutes);
+app.use(`${api}/categorias`, categoriasRoutes);
 app.use(`${api}/usuarios`, usuariosRoutes);
 app.use(`${api}/pedidos`, pedidosRoutes);
 

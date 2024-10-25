@@ -1,69 +1,68 @@
-const { Category } = require("../models/category");
+const { Categoria } = require("../models/categoria");
 const express = require("express");
 const router = express.Router();
 
 // TRAZER A LISTA DE CATEGORIAS
 router.get(`/`, async (req, res) => {
-  const categoryList = await Category.find();
+  const categoriaList = await Categoria.find();
 
-  if (!categoryList) {
+  if (!categoriaList) {
     res.status(500).json({ sucess: false });
   }
-  res.status(200).send(categoryList);
+  res.status(200).send(categoriaList);
 });
 
 // TRAZER UMA CATEGORIA PELO ID
 router.get("/:id", async (req, res) => {
-  const category = await Category.findById(req.params.id);
+  const categoria = await Categoria.findById(req.params.id);
 
-  if (!category) {
+  if (!categoria) {
     res.status(500).json({
       message: "A categoria com o ID informado não foi encontrado",
     });
   }
-  res.status(200).send(category);
+  res.status(200).send(categoria);
 });
 
 // ADICIONAR UMA CATEGORIA
 router.post("/", async (req, res) => {
-  let category = new Category({
-    name: req.body.name,
+  let categoria = new Categoria({
+    nome: req.body.nome,
     icon: req.body.icon,
-    color: req.body.color,
+    cor: req.body.cor,
   });
-  category = await category.save();
+  categoria = await categoria.save();
 
-  if (!category) return res.status(404).send("A categoria não foi criada!");
-  res.send(category);
+  if (!categoria) return res.status(404).send("A categoria não foi criada!");
+  res.send(categoria);
 });
 
 // ALTERAR UMA CATEGORIA
 router.put("/:id", async (req, res) => {
-  const category = await Category.findByIdAndUpdate(
+  const categoria = await Categoria.findByIdAndUpdate(
     req.params.id,
     {
-      name: req.body.name,
+      nome: req.body.nome,
       icon: req.body.icon,
-      color: req.body.color,
+      cor: req.body.cor,
+      imagem: req.body.imagem,
     },
     { new: true }
   );
 
-  if (!category) return res.status(400).send("A categoria não foi criada!");
-  res.send(category);
+  if (!categoria) return res.status(400).send("A categoria não foi criada!");
+  res.send(categoria);
 });
 
 //DELETAR UMA CATEGORIA
 router.delete("/:id", (req, res) => {
-  Category.findByIdAndDelete(req.params.id)
-    .then((category) => {
-      if (category) {
-        return res
-          .status(200)
-          .json({
-            sucess: true,
-            message: "A categoria foi deletada com sucesso!",
-          });
+  Categoria.findByIdAndDelete(req.params.id)
+    .then((categoria) => {
+      if (categoria) {
+        return res.status(200).json({
+          sucess: true,
+          message: "A categoria foi deletada com sucesso!",
+        });
       } else {
         return res
           .status(404)
