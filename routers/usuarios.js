@@ -76,7 +76,8 @@ router.post("/login", async (req, res) => {
       {
         usuarioId: usuario.id,
       },
-      segredo
+      segredo,
+      { expiresIn: "1d" }
     );
     res.status(200).send({ usuario: usuario.email, token: token });
   } catch (error) {
