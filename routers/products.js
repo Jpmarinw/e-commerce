@@ -86,12 +86,10 @@ router.delete("/:id", (req, res) => {
   Product.findByIdAndDelete(req.params.id)
     .then((product) => {
       if (product) {
-        return res
-          .status(200)
-          .json({
-            sucess: true,
-            message: "O produto foi deletado com sucesso!",
-          });
+        return res.status(200).json({
+          sucess: true,
+          message: "O produto foi deletado com sucesso!",
+        });
       } else {
         return res
           .status(404)
@@ -102,5 +100,21 @@ router.delete("/:id", (req, res) => {
       return res.status(400).json({ sucess: false, error: err });
     });
 });
+
+// TRAZER A QUANTIDADE DE PRODUTOS 
+router.get('/get/count', async (req, res) => {
+    try {
+      const productCount = await Product.countDocuments();
+  
+      if (productCount === 0) {
+        return res.status(404).json({ success: false, message: 'Nenhum produto encontrado' });
+      }
+  
+      res.status(200).json({ quantidade: productCount });
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+  
 
 module.exports = router;

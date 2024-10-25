@@ -11,7 +11,7 @@ const api = process.env.API_URL;
 
 const productsRoutes = require("../routers/products");
 const categoriesRoutes = require("../routers/categories");
-const usersRoutes = require("../routers/users");
+const usuariosRoutes = require("../routers/usuarios");
 const pedidosRoutes = require("../routers/pedidos");
 
 //middleware
@@ -21,7 +21,7 @@ app.use(morgan("tiny"));
 //Routers
 app.use(`${api}/products`, productsRoutes);
 app.use(`${api}/categories`, categoriesRoutes);
-app.use(`${api}/users`, usersRoutes);
+app.use(`${api}/usuarios`, usuariosRoutes);
 app.use(`${api}/pedidos`, pedidosRoutes);
 
 // Conexão com o bando de dados
