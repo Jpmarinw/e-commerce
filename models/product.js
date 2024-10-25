@@ -59,4 +59,26 @@ const productSchema = mongoose.Schema({
   },
 });
 
+// SE EU QUISER EXCLUR O _ID DA VISUALIZAÇÃO DO JSON
+/*productSchema.virtual("id").get(function () {
+  return this._id ? this._id.toHexString() : null;
+});
+
+productSchema.set("toJSON", {
+  virtuals: true, // Inclui campos virtuais na conversão para JSON
+  versionKey: false, // Remove o campo __v
+  transform: function (doc, ret) {
+    delete ret._id; // Remove o campo _id do resultado JSON
+  },
+});*/
+
+// ADICIONA UM VIRTUAL ID
+productSchema.virtual('id').get(function() {
+  return this._id.toHexString();
+});
+
+productSchema.set('toJSON', {
+  virtuals: true,
+})
+
 exports.Product = mongoose.model("Product", productSchema);

@@ -7,7 +7,7 @@ const mongoose = require("mongoose");
 // TRAZER A LISTA DE PRODUTOS
 router.get(`/`, async (req, res) => {
   const productList = await Product.find()
-    .select("nome imagem category -_id")
+    .select("nome imagem category _id id")
     .populate("category");
 
   if (!productList) {
@@ -101,20 +101,50 @@ router.delete("/:id", (req, res) => {
     });
 });
 
-// TRAZER A QUANTIDADE DE PRODUTOS 
-router.get('/get/count', async (req, res) => {
-    try {
-      const productCount = await Product.countDocuments();
-  
-      if (productCount === 0) {
-        return res.status(404).json({ success: false, message: 'Nenhum produto encontrado' });
-      }
-  
-      res.status(200).json({ quantidade: productCount });
-    } catch (error) {
-      res.status(500).json({ success: false, error: error.message });
+// TRAZER A QUANTIDADE DE PRODUTOS
+router.get("/get/count", async (req, res) => {
+  try {
+    const productCount = await Product.countDocuments();
+
+    if (productCount === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Nenhum produto encontrado" });
     }
-  });
-  
+
+    res.status(200).json({ quantidade: productCount });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// TRAZER A QUANTIDADE DE PRODUTOS EM DESTAQUE
+router.get("/get/destaque/:count", async (req, res) => {
+  const count = req.params.count ? req.params.count : 0;
+  const products = await Product.find({ isFeatured: true }).limit(+count);
+
+  if (!products) {
+    res.status(500).json({ sucess: false });
+  }
+  res.send(products);
+});
+
+// TRAZER PRODUTOS POR CATEGORIA
+router.get(`/`, async (req, res) => {
+  let filter = {};
+
+  if (req.query.categories) {
+    filter = req.query.categories.split(",");
+  }
+
+  const productList = await Product.find(filter).populate(
+    "category"
+  );
+
+  if (!productList) {
+    res.status(500).json({ sucess: false });
+  }
+  res.send(productList);
+});
 
 module.exports = router;
