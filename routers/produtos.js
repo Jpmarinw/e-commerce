@@ -3,6 +3,7 @@ const { Categoria } = require("../models/categoria");
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
+const moment = require("moment-timezone");
 
 // TRAZER A LISTA DE PRODUTOS
 router.get(`/`, async (req, res) => {

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const moment = require("moment-timezone");
 
 const produtoSchema = mongoose.Schema({
   nome: {
@@ -55,7 +56,7 @@ const produtoSchema = mongoose.Schema({
   },
   dataCriacao: {
     type: Date,
-    default: Date.now,
+    default: () => moment().tz("America/Manaus").toDate(),
   },
 });
 
