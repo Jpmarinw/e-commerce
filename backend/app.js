@@ -13,10 +13,12 @@ const produtosRoutes = require("../routers/produtos");
 const categoriasRoutes = require("../routers/categorias");
 const usuariosRoutes = require("../routers/usuarios");
 const pedidosRoutes = require("../routers/pedidos");
+const authJwt = require("./helpers/jwt");
 
 //middleware
 app.use(bodyParser.json());
 app.use(morgan("tiny"));
+app.use(authJwt());
 
 //Routers
 app.use(`${api}/produtos`, produtosRoutes);
