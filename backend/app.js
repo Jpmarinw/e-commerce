@@ -15,10 +15,9 @@ const usuariosRoutes = require("../routers/usuarios");
 const pedidosRoutes = require("../routers/pedidos");
 const authJwt = require("./helpers/jwt");
 
+//middlewares
 app.use(cors());
 app.options("*", cors());
-
-//middleware
 app.use(bodyParser.json());
 app.use(morgan("tiny"));
 app.use(authJwt());
