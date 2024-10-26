@@ -5,7 +5,7 @@ const app = express();
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const mongoose = require("mongoose");
-
+const cors = require("cors");
 require("dotenv/config");
 const api = process.env.API_URL;
 
@@ -15,10 +15,21 @@ const usuariosRoutes = require("../routers/usuarios");
 const pedidosRoutes = require("../routers/pedidos");
 const authJwt = require("./helpers/jwt");
 
+app.use(cors());
+app.options("*", cors());
+
 //middleware
 app.use(bodyParser.json());
 app.use(morgan("tiny"));
 app.use(authJwt());
+app.use((err, req, res, next) => {
+  if (err) {
+    res.status(500).json({ mensagem: err });
+  } else {
+    next();
+  }
+});
+
 
 //Routers
 app.use(`${api}/produtos`, produtosRoutes);
