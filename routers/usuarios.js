@@ -26,8 +26,35 @@ router.get("/:id", async (req, res) => {
   res.status(200).send(usuario);
 });
 
-// ADICIONAR USUÁRIOS
+// ADICIONAR USUÁRIOS (QUANDO ADMIN)
 router.post("/", async (req, res) => {
+  try {
+    const senhaHash = bcrypt.hashSync(req.body.senha, 10);
+
+    let usuario = new Usuario({
+      nome: req.body.nome,
+      email: req.body.email,
+      passwordHash: senhaHash,
+      telefone: req.body.telefone,
+      isAdmin: req.body.isAdmin,
+      rua: req.body.rua,
+      cep: req.body.cep,
+      casa: req.body.casa,
+      cidade: req.body.cidade,
+      pais: req.body.pais,
+    });
+
+    usuario = await usuario.save();
+
+    if (!usuario) return res.status(404).send("O usuário não foi criado!");
+    res.send(usuario);
+  } catch (error) {
+    res.status(500).send("Erro no cadastro");
+  }
+});
+
+// CADASTRAR UM USUÁRIO (QUANDO USUÁRIO)
+router.post("/cadastro", async (req, res) => {
   try {
     const senhaHash = bcrypt.hashSync(req.body.senha, 10);
 

@@ -14,6 +14,7 @@ const categoriasRoutes = require("../routers/categorias");
 const usuariosRoutes = require("../routers/usuarios");
 const pedidosRoutes = require("../routers/pedidos");
 const authJwt = require("./helpers/jwt");
+const errorHandler = require("./helpers/error-handler");
 
 //middlewares
 app.use(cors());
@@ -21,14 +22,7 @@ app.options("*", cors());
 app.use(bodyParser.json());
 app.use(morgan("tiny"));
 app.use(authJwt());
-app.use((err, req, res, next) => {
-  if (err) {
-    res.status(500).json({ mensagem: err });
-  } else {
-    next();
-  }
-});
-
+app.use(errorHandler);
 
 //Routers
 app.use(`${api}/produtos`, produtosRoutes);
