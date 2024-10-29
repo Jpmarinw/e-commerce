@@ -5,12 +5,29 @@ const router = express.Router();
 
 // TRAZER A LISTA DE PEDIDOS
 router.get(`/`, async (req, res) => {
-  const pedidosList = await Pedido.find();
+  const pedidosList = await Pedido.find()
+    .populate("usuario", "nome")
+    .sort({ dataPedido: -1 });
 
   if (!pedidosList) {
     res.status(500).json({ sucess: false });
   }
   res.send(pedidosList);
+});
+
+// TRAZER UM PEDIDO APENAS
+router.get(`/:id`, async (req, res) => {
+  const pedido = await Pedido.findById(req.params.id)
+    .populate("usuario", "nome")
+    .populate({
+      path: "itensPedido",
+      populate: { path: "produto", populate: "categoria" },
+    });
+
+  if (!pedido) {
+    res.status(500).json({ sucess: false });
+  }
+  res.send(pedido);
 });
 
 // CRIAR UM PEDIDO
@@ -46,6 +63,26 @@ router.post("/", async (req, res) => {
 
   if (!pedido) return res.status(404).send("O pedido não foi criado!");
   res.send(pedido);
+});
+
+// DELETAR UM PEDIDO
+router.delete("/:id", (req, res) => {
+  Pedido.findByIdAndDelete(req.params.id)
+    .then((pedido) => {
+      if (pedido) {
+        return res.status(200).json({
+          sucess: true,
+          message: "O pedido foi deletado com sucesso!",
+        });
+      } else {
+        return res
+          .status(404)
+          .json({ sucess: false, message: "O pedido não foi encontrado!" });
+      }
+    })
+    .catch((err) => {
+      return res.status(400).json({ sucess: false, error: err });
+    });
 });
 
 module.exports = router;

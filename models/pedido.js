@@ -4,7 +4,7 @@ const pedidoSchema = mongoose.Schema({
   itensPedido: [
     {
       type: mongoose.Schema.ObjectId,
-      ref: "pedidoItem",
+      ref: "PedidoItem",
       required: true,
     },
   ],
