@@ -135,4 +135,41 @@ router.put("/:id", async (req, res) => {
   res.send(usuario);
 });
 
+// DELETAR UM USUÁRIO
+router.delete("/:id", (req, res) => {
+  Usuario.findByIdAndDelete(req.params.id)
+    .then((usuario) => {
+      if (usuario) {
+        return res.status(200).json({
+          sucess: true,
+          message: "O usuário foi deletado com sucesso!",
+        });
+      } else {
+        return res
+          .status(404)
+          .json({ sucess: false, message: "O usuário não foi encontrado!" });
+      }
+    })
+    .catch((err) => {
+      return res.status(400).json({ sucess: false, error: err });
+    });
+});
+
+// QUANTIDADE DE USUÁRIOS CADASTRADOS
+router.get("/get/count", async (req, res) => {
+  try {
+    const usuarioCount = await Usuario.countDocuments();
+
+    if (usuarioCount === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Nenhum usuário encontrado" });
+    }
+
+    res.status(200).json({ quantidade: usuarioCount });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 module.exports = router;
