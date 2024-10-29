@@ -65,11 +65,29 @@ router.post("/", async (req, res) => {
   res.send(pedido);
 });
 
+// ATUALIZAR O STATUS DE UM PEDIDO
+router.put("/:id", async (req, res) => {
+  const pedido = await Pedido.findByIdAndUpdate(
+    req.params.id,
+    {
+      status: req.body.status,
+    },
+    { new: true }
+  );
+  if (!pedido) {
+    return res.status(400).send("O pedido não foi encontrado");
+  }
+  res.send(pedido);
+});
+
 // DELETAR UM PEDIDO
 router.delete("/:id", (req, res) => {
   Pedido.findByIdAndDelete(req.params.id)
-    .then((pedido) => {
+    .then(async (pedido) => {
       if (pedido) {
+        await pedido.itensPedido.map(async (pedidoItem) => {
+          await PedidoItem.findByIdAndDelete(pedidoItem);
+        });
         return res.status(200).json({
           sucess: true,
           message: "O pedido foi deletado com sucesso!",
