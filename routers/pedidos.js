@@ -15,6 +15,21 @@ router.get(`/`, async (req, res) => {
   res.send(pedidosList);
 });
 
+// TRAZER A LISTA DE PEDIDOS POR USUÁRIO
+router.get(`/get/pedido-usuario/:usuarioid`, async (req, res) => {
+  const usuarioPedidosList = await Pedido.find({usuario: req.params.usuarioid})
+  .populate({
+    path: "itensPedido",
+    populate: { path: "produto", populate: "categoria" },
+  })
+    .sort({ dataPedido: -1 });
+
+  if (!usuarioPedidosList) {
+    res.status(500).json({ sucess: false });
+  }
+  res.send(usuarioPedidosList);
+});
+
 // TRAZER UM PEDIDO APENAS
 router.get(`/:id`, async (req, res) => {
   const pedido = await Pedido.findById(req.params.id)
@@ -47,6 +62,20 @@ router.post("/", async (req, res) => {
 
   const itensPedidoResolved = await itensPedidoIds;
 
+  //CALCULAR O PREÇO TOTAL DOS PRODUTOS
+  const precosTotal = await Promise.all(
+    itensPedidoResolved.map(async (itemPedidoId) => {
+      const pedidoItem = await PedidoItem.findById(itemPedidoId).populate(
+        "produto",
+        "preco"
+      );
+      const precoTotal = pedidoItem.produto.preco * pedidoItem.quantidade;
+      return precoTotal;
+    })
+  );
+
+  const precoTotal = precosTotal.reduce((a, b) => a + b, 0);
+
   let pedido = new Pedido({
     itensPedido: itensPedidoResolved,
     enderecoEnvio1: req.body.enderecoEnvio1,
@@ -55,7 +84,7 @@ router.post("/", async (req, res) => {
     cep: req.body.cep,
     pais: req.body.pais,
     telefone: req.body.telefone,
-    precoTotal: req.body.precoTotal,
+    precoTotal: precoTotal,
     usuario: req.body.usuario,
   });
 
@@ -101,6 +130,36 @@ router.delete("/:id", (req, res) => {
     .catch((err) => {
       return res.status(400).json({ sucess: false, error: err });
     });
+});
+
+// TRAZER A QUANTIDADE DE VENDAS
+router.get("/get/totalvendas", async (req, res) => {
+  const vendasTotais = await Pedido.aggregate([
+    { $group: { _id: null, totalvendas: { $sum: "$precoTotal" } } },
+  ]);
+
+  if (!vendasTotais) {
+    return res.status(400).send("A venda de pedidos não foi gerada");
+  }
+
+  res.send({ totalvendas: vendasTotais.pop().totalvendas });
+});
+
+// TRAZER A QUANTIDADE DE PEDIDOS
+router.get("/get/count", async (req, res) => {
+  try {
+    const pedidoCount = await Pedido.countDocuments();
+
+    if (!pedidoCount) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Nenhum pedido encontrado" });
+    }
+
+    res.status(200).json({ quantidade: pedidoCount });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
 });
 
 module.exports = router;
