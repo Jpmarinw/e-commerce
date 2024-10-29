@@ -41,28 +41,11 @@ router.post("/", async (req, res) => {
     precoTotal: req.body.precoTotal,
     usuario: req.body.usuario,
   });
+
   pedido = await pedido.save();
 
   if (!pedido) return res.status(404).send("O pedido não foi criado!");
   res.send(pedido);
 });
-
-/*
-{
-"itensPedido" : [
-{
-"quantidade": 3,
-"produto": "id do produto"},
-{
-"quantidade": 2,
-"produto": "id do produto"}],
-"enderecoEnvio1": "Rua Aristofano Antony, 66, Petrópolis",
-"cidade": "Manaus",
-"cep": "69063-300",
-"pais": "Brasil",
-"telefone": "9299496945",
-"usuario": "id do usuario"
-}
-*/
 
 module.exports = router;
