@@ -7,8 +7,9 @@ function authJwt() {
   return expressJwt({
     secret: segredo,
     algorithms: ["HS256"],
-    isRevoked: isRevoked, // Referência correta para função async
+    isRevoked: isRevoked,
   }).unless({
+    // DEFININDO APIs QUE O USUÁRIO PODE USAR SEM ESTAR AUTENTICADO NO SISTEMA
     path: [
       { url: /\/api\/v1\/produtos(.*)/, methods: ["GET", "OPTIONS"] },
       { url: /\/api\/v1\/categorias(.*)/, methods: ["GET", "OPTIONS"] },
@@ -18,7 +19,7 @@ function authJwt() {
   });
 }
 
-// Ajuste para usar async/await corretamente
+// FUNÇÃO PARA APENAS ADMINS PODEREM USAR APIs DO TIPO POST, PUT E DELETE
 async function isRevoked(req, jwt) {
   const payload = jwt.payload;
   return !payload.isAdmin;
