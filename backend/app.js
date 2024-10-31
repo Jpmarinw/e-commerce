@@ -9,10 +9,10 @@ const cors = require("cors");
 require("dotenv/config");
 const api = process.env.API_URL;
 
-const produtosRoutes = require("../routers/produtos");
-const categoriasRoutes = require("../routers/categorias");
-const usuariosRoutes = require("../routers/usuarios");
-const pedidosRoutes = require("../routers/pedidos");
+const produtosRoutes = require("./routers/produtos");
+const categoriasRoutes = require("./routers/categorias");
+const usuariosRoutes = require("./routers/usuarios");
+const pedidosRoutes = require("./routers/pedidos");
 const authJwt = require("./helpers/jwt");
 const errorHandler = require("./helpers/error-handler");
 
