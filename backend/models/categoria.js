@@ -5,10 +5,6 @@ const categoriaSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  cor: {
-    type: String,
-    default: "",
-  },
   icon: {
     type: String,
     default: "",

@@ -29,7 +29,6 @@ router.post("/", async (req, res) => {
   let categoria = new Categoria({
     nome: req.body.nome,
     icon: req.body.icon,
-    cor: req.body.cor,
   });
   categoria = await categoria.save();
 
@@ -44,7 +43,6 @@ router.put("/:id", async (req, res) => {
     {
       nome: req.body.nome,
       icon: req.body.icon,
-      cor: req.body.cor,
       imagem: req.body.imagem,
     },
     { new: true }
