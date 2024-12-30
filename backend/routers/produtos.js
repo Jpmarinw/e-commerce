@@ -4,6 +4,32 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const moment = require("moment-timezone");
+const multer = require("multer");
+
+const FILE_TYPE_MAP = {
+  "image/png": "png",
+  "image/jpeg": "jpg",
+  "image/jpg": "jpg",
+};
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const isValid = FILE_TYPE_MAP[file.mimetype];
+    let uploadError = new Error("Arquivo inválido!");
+
+    if (isValid) {
+      uploadError = null;
+    }
+    cb(uploadError, "public/uploads");
+  },
+  filename: function (req, file, cb) {
+    const fileName = file.originalname.split(" ").join("-");
+    const extension = FILE_TYPE_MAP[file.minetype];
+    cb(null, `${fileName}-${Date.now()}.${extension}`);
+  },
+});
+
+const uploadOptions = multer({ storage: storage });
 
 // TRAZER A LISTA DE PRODUTOS
 router.get(`/`, async (req, res) => {
@@ -28,15 +54,17 @@ router.get(`/:id`, async (req, res) => {
 });
 
 // ADICIONAR UM PRODUTO
-router.post(`/`, async (req, res) => {
+router.post(`/`, uploadOptions.single("imagem"), async (req, res) => {
   const categoria = await Categoria.findById(req.body.categoria);
   if (!categoria) return res.status(400).send("Categoria inválida!");
+  const fileName = req.file.filename;
+  const basePath = `${req.protocol}://${req.get("host")}/public/uploads/`;
 
   let produto = new Produto({
     nome: req.body.nome,
     descricao: req.body.descricao,
     descDetalhada: req.body.descDetalhada,
-    imagem: req.body.imagem,
+    imagem: `${basePath}${fileName}`,
     marca: req.body.marca,
     preco: req.body.preco,
     categoria: req.body.categoria,
