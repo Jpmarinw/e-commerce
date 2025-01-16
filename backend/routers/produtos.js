@@ -24,7 +24,7 @@ const storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     const fileName = file.originalname.split(" ").join("-");
-    const extension = FILE_TYPE_MAP[file.minetype];
+    const extension = FILE_TYPE_MAP[file.mimetype];
     cb(null, `${fileName}-${Date.now()}.${extension}`);
   },
 });
@@ -57,6 +57,10 @@ router.get(`/:id`, async (req, res) => {
 router.post(`/`, uploadOptions.single("imagem"), async (req, res) => {
   const categoria = await Categoria.findById(req.body.categoria);
   if (!categoria) return res.status(400).send("Categoria inválida!");
+
+  const file = req.file;
+  if (!file) return res.status(400).send("Sem imagens nessa requisição!");
+
   const fileName = req.file.filename;
   const basePath = `${req.protocol}://${req.get("host")}/public/uploads/`;
 
